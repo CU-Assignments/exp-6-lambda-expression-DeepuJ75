@@ -1,0 +1,61 @@
+import java.util.*;
+import java.util.stream.Collectors;
+
+class Product {
+    String name;
+    String category;
+    double price;
+
+    public Product(String name, String category, double price) {
+        this.name = name;
+        this.category = category;
+        this.price = price;
+    }
+
+    public void display() {
+        System.out.println(name + " | " + category + " | $" + price);
+    }
+}
+
+public class ProductProcessing {
+    public static void main(String[] args) {
+        List<Product> products = Arrays.asList(
+            new Product("Laptop", "Electronics", 1000),
+            new Product("Phone", "Electronics", 700),
+            new Product("Shirt", "Clothing", 50),
+            new Product("Jeans", "Clothing", 80),
+            new Product("TV", "Electronics", 1500),
+            new Product("Sofa", "Furniture", 1200)
+        );
+
+        // 1. Grouping products by category
+        Map<String, List<Product>> groupedProducts = products.stream()
+                .collect(Collectors.groupingBy(p -> p.category));
+
+        System.out.println("Products Grouped by Category:");
+        groupedProducts.forEach((category, list) -> {
+            System.out.println(category + ": ");
+            list.forEach(Product::display);
+        });
+
+        // 2. Finding the most expensive product in each category
+        Map<String, Optional<Product>> mostExpensiveByCategory = products.stream()
+                .collect(Collectors.groupingBy(
+                        p -> p.category,
+                        Collectors.maxBy(Comparator.comparingDouble(p -> p.price))
+                ));
+
+        System.out.println("\nMost Expensive Product in Each Category:");
+        mostExpensiveByCategory.forEach((category, product) -> {
+            product.ifPresent(Product::display);
+        });
+
+        // 3. Calculating the average price of all products
+        double avgPrice = products.stream()
+                .mapToDouble(p -> p.price)
+                .average()
+                .orElse(0);
+
+        System.out.println("\nAverage Price of All Products: $" + avgPrice);
+    }
+}
